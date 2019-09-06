@@ -50,6 +50,8 @@
 				d3.select('#tooltip').attr('style', 'position: absolute; top: 0; left: 0;')
 
 				const chicago_communities_affordable_housing = await d3.json('chicago.json')
+				const housing = await d3.json('affordable_housing_per_community_features.json')
+				const housing_communities = new Map(housing);
 
 				projection.fitExtent([[20, 20], [width, height]], chicago_communities_affordable_housing);
 
@@ -98,6 +100,7 @@
 					changeNeighborhood(selectedNeighborhood)
 				})
 
+
 				const g = svg.append('g')
 				g.selectAll('path')
 				.data(chicago_communities_affordable_housing.features)
@@ -127,6 +130,8 @@
 						changeNeighborhood(d)
 					})
 
+				const g_housing = svg.append('g').attr('class', 'housing')
+
 				function updateFeatures() {
 					g.selectAll('path')
 					.data(chicago_communities_affordable_housing.features)
@@ -143,6 +148,9 @@
 					d3.select('#neighborhoods').classed('hidden', true)
 					d3.select('#location').text(d.properties.community)
 					d3.select('#percentage-overall').text(d3.format(".1%")(d.properties[indicator]/100 || 0))
+					g_housing.selectAll('circle').data(housing_communities.get(d.properties.area_numbe))
+						.join('circle').attr('r', 2).attr('cx', (d) => projection([d.longitude,d.latitude])[0])
+						.attr('cy', (d) => projection([d.longitude,d.latitude])[1])
 					zoomTo(d)
 				}
 
@@ -162,6 +170,7 @@
 				}
 				function zoomed() {
 					g.attr('transform', d3.event.transform);
+					g_housing.attr('transform', d3.event.transform);
 				}
 				function zoomStart() {
 					if(zoomedToNeighborhood) {
