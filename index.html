@@ -6,36 +6,46 @@
 		<title>Affordable Housing Chicago</title>
 		<link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet">
 		<script src="https://d3js.org/d3.v5.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/d3-annotation/2.3.2/d3-annotation.min.js"></script>
 	</head>
-	<body>
-		<h1 class="text-4xl text-center">Housing Burden Chicago</h1>
-		<div class="mt-4 flex justify-center">
-			<div class="" id="percentage-overall">34%</div>
-			<div class="dotted-underline" id="indicator">&nbsp;of households paying 30% for rent</div>
-			<div class="">&nbsp;in&nbsp;</div>
-			<a class="underline" href="" id="location">Chicago</a>
-			<select class="hidden" id="neighborhoods"></select>
-		</div>
-		<div id="map"><svg></svg></div>
-		<div id="tooltip" class="bg-white p-2 border">
-			<div class="text-xl text-center" id="community"></div>
-			<div class="flex">
-				<div class="" id="small-map"></div>
-				<div class=""><div class="text-base text-center" id="percentage"></div></div>
+	<body class="font-serif p-4">
+		<div class="mx-auto container">
+			<h1 class="text-6xl text-center">Housing Burden Chicago</h1>
+			<div class="my-4 text-2xl flex justify-center ">
+				<div class="" id="percentage-overall">48%</div>
+				<div class="dotted-underline" id="indicator">&nbsp;of households paying&nbsp; </div>
+				<a class="underline" href="javascript:void(0)" id="indicator">30%</a>
+				<select class="hidden" id="indicator">
+					<option value="paying_30">30%</option>
+					<option value="paying_50">50%</option>
+				</select>
+				<div>&nbsp; for rent</div>
+				<div class="">&nbsp;in&nbsp;</div>
+				<a class="underline" href="javascript:void(0)" id="location">Chicago</a>
+				<select class="hidden" id="neighborhoods"></select>
+			</div>
+			<div id="map"><svg></svg></div>
+			<div id="tooltip" class="bg-white p-2 border">
+				<div class="text-xl text-center" id="community"></div>
+				<div class="flex">
+					<div class="" id="small-map"></div>
+					<div class=""><div class="text-base text-center" id="percentage"></div></div>
+				</div>
+			</div>
+			<div class="attribution">
+				<h3>Data Sources</h3>
+				<p>Housing Burden Data: <a href="http://2018.ilpovertyreport.org" >Heartland Alliance: ILLINOIS POVERTY REPORT</a><br/>
+				Neighborhood Data: <a href="https://data.cityofchicago.org/api/geospatial/cauq-8yn6?method=export&format=GeoJSON">City of Chicago Open Data Portal</a>
+				</p>
 			</div>
 		</div>
-		<div class="attribution">
-			<h3>Data Sources</h3>
-			<p>Housing Burden Data: <a href="http://2018.ilpovertyreport.org" >Heartland Alliance: ILLINOIS POVERTY REPORT</a><br/>
-			Neighborhood Data: <a href="https://data.cityofchicago.org/api/geospatial/cauq-8yn6?method=export&format=GeoJSON">City of Chicago Open Data Portal</a>
-			</p>
 		<script type="text/javascript" charset="utf-8">
 			const chart = async () => {
 				let zoomedToNeighborhood = false;
 				const width = 960;
 				const height = 600;
-				const indicator = 'paying_50';
-				const colorScheme = d3.schemeGnBu[3];
+				const indicator = 'paying_30';
+				const colorScheme = d3.schemeOrRd[6];
 
 				const projection = d3.geoAlbers()
 				const small_projection = d3.geoAlbers()
@@ -59,7 +69,6 @@
 				const units_totals = d3.sum(chicago_communities_affordable_housing.features, (d) => (d.properties.total_units));
 				const affordable_units_total = d3.sum(chicago_communities_affordable_housing.features, (d) => (d.properties.affordable_units));
 
-				d3.select('#percentage-overall').text(d3.format(".0%")(0))
 
 				const colors = d3.scaleLinear()
 					.domain(indicator_extent)
