@@ -10,6 +10,7 @@
 		<style>
 		  #tooltip { 
 		    width: 250px;
+				opacity: 0;
 		  }
 		</style>
 	</head>
@@ -45,13 +46,13 @@
 						<div class="text-gray-600">50% of income: <span class="font-bold text-black" id="percentage-50">100</span></div></div>
 				</div>
 			</div>
-			<div class="table my-8">
-			  <table id="data-table">
+			<div class="table my-8 font-light text-sm">
+			  <table id="data-table" >
 			    <thead>
 			      <tr>
-			        <th>Neighborhood</th>
-			        <th>30% of income for rent</th>
-			        <th>50% of income for rent</th>
+			        <th class="pr-2 font-normal text-left">Neighborhood</th>
+			        <th class="pr-2">30% of income for rent</th>
+			        <th class="pr-2">50% of income for rent</th>
 			        </tr>
 			        </thead>
 			        <tbody></tbody>
@@ -206,6 +207,12 @@
 						zoomedToNeighborhood = false;
 					}
 				}
+				function capitalize(str) {
+					return str.replace(/\w\S*/g, function(txt){
+							return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+					});
+				}
+
 				var zoom = d3.zoom().on('zoom', zoomed).on('start', zoomStart);
 				svg.call(zoom);
 				
@@ -215,9 +222,9 @@
 				const row = table.select('tbody').selectAll('tr').data(chicago_communities_affordable_housing.features)
 				.join('tr')
 				
-				row.append('td').text(function(d) { return d.properties.community;})
-				row.append('td').text(function(d) { return d.properties.paying_30;}).attr('align', 'right')
-				row.append('td').text(function(d) { return d.properties.paying_50;}).attr('align', 'right')
+				row.append('td').text(function(d) { return capitalize(d.properties.community.toLowerCase());}).attr('class', 'py-1 pr-2 border-b')
+				row.append('td').text(function(d) { return d.properties.paying_30;}).attr('align', 'right').attr('class', 'py-1 pr-2 border-b')
+				row.append('td').text(function(d) { return d.properties.paying_50;}).attr('align', 'right').attr('class', 'py-1 pr-2 border-b')
 			}
 			chart();
 		</script>
