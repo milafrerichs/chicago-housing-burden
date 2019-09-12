@@ -6,6 +6,7 @@
 		<title>Affordable Housing Chicago</title>
 		<link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet">
 		<script src="https://d3js.org/d3.v5.min.js"></script>
+		<script src="legend.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/d3-annotation/2.3.2/d3-annotation.min.js"></script>
 		<style>
 		  #tooltip { 
@@ -94,7 +95,7 @@
 
 				projection.fitExtent([[20, 20], [width, height]], chicago_communities_affordable_housing);
 
-				const indicator_extent = [0,100];
+				const indicator_extent = d3.extent(chicago_communities_affordable_housing.features, (d) => (d.properties[indicator]));
 				const units_extent = d3.extent(chicago_communities_affordable_housing.features, (d) => (d.properties.total_units));
 				const units_totals = d3.sum(chicago_communities_affordable_housing.features, (d) => (d.properties.total_units));
 				const affordable_units_total = d3.sum(chicago_communities_affordable_housing.features, (d) => (d.properties.affordable_units));
@@ -217,16 +218,25 @@
 
 				var zoom = d3.zoom().on('zoom', zoomed).on('start', zoomStart);
 				svg.call(zoom);
-				
+
 				chicago_communities_affordable_housing.features.sort(function(a,b) { return b.properties.paying_30 - a.properties.paying_30; })
-				
+
 				const table = d3.select('#data-table')
 				const row = table.select('tbody').selectAll('tr').data(chicago_communities_affordable_housing.features)
 				.join('tr')
-				
+
 				row.append('td').text(function(d) { return capitalize(d.properties.community.toLowerCase());}).attr('class', 'py-1 pr-2 border-b')
 				row.append('td').text(function(d) { return d.properties.paying_30;}).attr('align', 'right').attr('class', 'py-1 pr-2 border-b')
 				row.append('td').text(function(d) { return d.properties.paying_50;}).attr('align', 'right').attr('class', 'py-1 pr-2 border-b')
+
+				const legendSvg = legend({color: colors})
+				// add average
+				const scale = d3.scaleLinear().range([0,320]).domain(indicator_extent)
+				const averageG = d3.select(legendSvg).append('g').attr('class', 'average').attr('font-size', 10).attr('text-anchor', 'middle')
+				averageG.attr("transform", `translate(${scale(48)}, 10)`)
+				averageG.append('line').attr('y2', 18).attr('y1', 5).attr('stroke', 'currentColor')
+				averageG.append('text').attr('y', -10).attr('dy', '0.4em').text('Chicago avg.: 48')
+				document.querySelector('#map').appendChild(legendSvg)
 			}
 			chart();
 		</script>
