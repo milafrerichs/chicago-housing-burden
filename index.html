@@ -37,12 +37,17 @@
 			  </div>
 			</div>
 			<div id="tooltip" class="bg-white p-2 border">
-				<div class="text-xl text-center" id="community"></div>
-				<div class="flex">
-					<div class="w-1/3" id="small-map"></div>
-					<div class="w-2/3 flex-row text-xs">
-					  <div class="text-gray-600">30% of income: <span class="font-bold text-black" id="percentage-30">100</span></div>
-						<div class="text-gray-600">50% of income: <span class="font-bold text-black" id="percentage-50">100</span></div></div>
+				<div class="" id="small-map"></div>
+				<div class="text-xl text-center border-b" id="community"></div>
+				<div class="flex mt-2">
+					<div class="w-1/2 ">
+						<div class="text-gray-600 text-xs">30% of income</div>
+						<div class="font-bold text-black" id="percentage-30">100</div>
+					</div>
+					<div class="w-1/2">
+						<div class="text-gray-600 text-xs">50% of income</div>
+						<div class="font-bold text-black" id="percentage-50">100</div>
+					</div>
 				</div>
 			</div>
 			<div class="table my-8">
@@ -71,7 +76,6 @@
 				const width = parent.clientWidth;
 				const height = 600;
 				const indicator = 'paying_30';
-				const colorScheme = d3.schemeOrRd[6];
 
 				const projection = d3.geoAlbers()
 				const small_projection = d3.geoAlbers()
@@ -89,16 +93,14 @@
 
 				projection.fitExtent([[20, 20], [width, height]], chicago_communities_affordable_housing);
 
-				//const indicator_extent = [0,d3.max(chicago_communities_affordable_housing.features, (d) => (d.properties[indicator]))];
-				const indicator_extent = d3.extent(chicago_communities_affordable_housing.features, (d) => (d.properties[indicator]));
+				const indicator_extent = [0,100];
 				const units_extent = d3.extent(chicago_communities_affordable_housing.features, (d) => (d.properties.total_units));
 				const units_totals = d3.sum(chicago_communities_affordable_housing.features, (d) => (d.properties.total_units));
 				const affordable_units_total = d3.sum(chicago_communities_affordable_housing.features, (d) => (d.properties.affordable_units));
 
 
-				const colors = d3.scaleLinear()
+				const colors = d3.scaleSequential(d3.interpolateOrRd)
 					.domain(indicator_extent)
-					.range(colorScheme);
 
 				function colorForEntry(d) { 
 					if(isNaN(parseInt(d.properties[indicator]))) {
@@ -114,7 +116,7 @@
 					d3.select('#tooltip').select('#total_units').text(d.properties.total_units || 0)
 					d3.select('#tooltip').select('#affordable_units').text(d.properties.affordable_units || 0)
 					small_projection.fitSize([50,50], d)
-					small_map = d3.select('#small-map').html('').append('svg').attr('width', 50).attr('height', 50)
+					small_map = d3.select('#small-map').html('').append('svg').attr('width', 50).attr('height', 50).attr('style', 'margin: 0 auto')
 					small_map.append('g').selectAll('path').data([d]).join('path').attr('d', smallGeoGenerator).attr('fill', '#ccc')
 				}
 
